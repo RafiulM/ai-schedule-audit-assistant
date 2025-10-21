@@ -1,90 +1,117 @@
 # Tech Stack Document
 
-This document explains the key technologies chosen for the **codeguide-starter** project. It’s written in everyday language so anyone—technical or not—can understand why each tool was picked and how it supports the application.
+This document explains the technology choices behind the **ai-schedule-audit-assistant** project in simple, everyday language. It covers the tools used for building the app’s front end, back end, hosting, security, and more—so anyone can understand why each part was chosen and how it contributes to the overall experience.
 
 ## 1. Frontend Technologies
-The frontend is everything the user sees and interacts with. For this project, we’ve used:
+These tools shape everything your eyes see and how you interact with the assistant.
 
 - **Next.js (App Router)**
-  - A React framework that makes page routing, server-side rendering, and API routes very simple.
-  - Enhances user experience by pre-rendering pages on the server or at build time, leading to faster initial load.
-- **React 18**
-  - The underlying library for building user interfaces with reusable components.
-  - Provides a smooth, interactive experience thanks to its virtual DOM and modern hooks.
-- **TypeScript**
-  - A superset of JavaScript that adds types (labels for data).
-  - Helps catch errors early during development and makes the code easier to maintain.
-- **CSS (globals.css & theme.css)**
-  - **globals.css** applies base styles (fonts, colors, resets) across the entire app.
-  - **dashboard/theme.css** defines the look and feel specific to the dashboard area.
-  - This separation keeps styles organized and avoids accidental style conflicts.
+  - A popular framework that makes building React websites easier. It splits code into server-side and client-side parts automatically, helping pages load faster.
+  - Lets us create dedicated folders for each screen (like `/dashboard`), keeping the code organized.
 
-By combining these tools, we have a clear structure (Next.js folders for pages and layouts), safer code (TypeScript), and flexible styling with vanilla CSS.
+- **React 18**
+  - The foundation for building user interfaces. It handles updating the screen when your data changes.
+  - Integrates smoothly with the AI chat libraries we use.
+
+- **Tailwind CSS**
+  - A utility-first styling system that provides ready-to-use CSS classes (for colors, spacing, layouts, etc.).
+  - Speeds up design work and keeps styles consistent across the app.
+
+- **shadcn/ui**
+  - A collection of pre-built, accessible components (buttons, cards, dialogs) that follow modern design patterns.
+  - Works on top of Tailwind, so everything looks cohesive.
+
+- **assistant-ui & @ai-sdk/react**
+  - Libraries provided by Vercel for building chat interfaces. They handle message input, streaming replies, and formatting chat bubbles.
+  - Let us plug in an AI model with minimal setup and focus on the conversation flow.
+
+- **Calendar Component (e.g., react-big-calendar)**
+  - A popular calendar library for React that displays events in day/week/month views.
+  - We style it with Tailwind to match the rest of the app.
 
 ## 2. Backend Technologies
-The backend handles data, user accounts, and the logic behind the scenes. Our choices here are:
+These pieces work behind the scenes to store your data, run AI logic, and keep everything in sync.
 
-- **Next.js API Routes**
-  - Allows us to write server-side code (`route.ts` files) alongside our frontend in the same project.
-  - Runs on Node.js, so we can handle requests like sign-up, sign-in, and data fetching in one place.
-- **Node.js Runtime**
-  - The JavaScript environment on the server that executes our API routes.
-- **bcrypt** (npm package)
-  - A library for hashing passwords securely before storing them.
-  - Ensures that even if someone got access to our data, raw passwords aren’t visible.
-- **(Optional) NextAuth.js or JWT**
-  - While this starter kit shows a custom authentication flow, it can easily integrate services like NextAuth.js for email-based login or JWT (JSON Web Tokens) for stateless sessions.
+- **Next.js API Routes & Server Actions**
+  - Built-in endpoints where we handle incoming chat messages and talk to the AI model.
+  - Support streaming responses, which makes the chat feel real-time.
 
-These components work together to receive user credentials, verify or store them securely, manage sessions or tokens, and deliver protected data back to the frontend.
+- **Better Auth**
+  - A secure authentication system that signs users in and protects routes.
+  - Ensures each person only sees their own chat history and schedule.
+
+- **PostgreSQL Database**
+  - A reliable, open-source database used to save user accounts, chat history, and schedule events.
+  - Runs locally in a Docker container for easy setup, mirroring production.
+
+- **Drizzle ORM**
+  - A toolkit that maps database tables to TypeScript code. It makes database queries readable and type-safe.
+  - Lets us define clear schemas for users, messages, and events.
+
+- **TypeScript**
+  - A version of JavaScript with built-in checks that catch mistakes early.
+  - Used everywhere—from front end to back end—to keep data consistent and reduce bugs.
 
 ## 3. Infrastructure and Deployment
-Infrastructure covers where and how we host the app, as well as how changes get delivered:
+How the app is hosted, updated, and managed.
+
+- **Vercel Platform**
+  - A hosting service tailored for Next.js apps. Deployments happen automatically whenever code is pushed to GitHub.
+  - Provides preview links for testing before updates go live.
 
 - **Git & GitHub**
-  - Version control system (Git) and remote hosting (GitHub) keep track of all code changes and allow team collaboration.
-- **Vercel (or Netlify)**
-  - A popular hosting service optimized for Next.js, with one-click deployments and global content delivery.
-  - Automatically rebuilds and deploys the site whenever code is pushed to the main branch.
-- **GitHub Actions (CI/CD)**
-  - Automates tasks like linting (ESLint), formatting (Prettier), and running any tests you add.
-  - Ensures that only clean, tested code goes live.
+  - Version control to track changes, collaborate, and manage code history.
+  - GitHub integration with Vercel triggers deployments on each pull request.
 
-Together, these tools provide a reliable, scalable setup where every code change is tested and deployed quickly, with minimal manual work.
+- **Docker (for Local Development)**
+  - Encapsulates the database in a container, so developers can run the same setup on any machine.
+  - Simplifies onboarding—just `docker-compose up` and the database is ready.
+
+- **CI/CD (Continuous Integration / Continuous Deployment)**
+  - Automated tests and builds run on every code change (via Vercel’s pipeline or GitHub Actions).
+  - Ensures that new features or bug fixes don’t break the app before they reach users.
 
 ## 4. Third-Party Integrations
-While this starter kit is minimal by design, it already includes or can easily add:
+External services that add key functionality without reinventing the wheel.
 
-- **bcrypt**
-  - For secure password hashing (included as an npm dependency).
-- **NextAuth.js** (optional)
-  - A full-featured authentication library supporting email/password, OAuth, and more.
-- **Sentry or LogRocket** (optional)
-  - For real-time error tracking and performance monitoring in production.
+- **Vercel AI SDK**
+  - Wraps OpenAI (or other AI models) in an easy-to-use interface.
+  - Supports streaming, tool-enabled parsing, and structured JSON output.
 
-These integrations help extend the app’s capabilities without building every feature from scratch.
+- **OpenAI (via Vercel AI SDK)**
+  - Provides the underlying AI models that power the chat assistant.
+  - Converts natural language prompts into helpful schedule audits or structured event data.
+
+- **Sentry (Error Tracking)**
+  - Monitors runtime errors in both front end and back end.
+  - Alerts the team to issues quickly, helping us maintain a stable experience.
 
 ## 5. Security and Performance Considerations
-We’ve baked in several measures to keep users safe and the app running smoothly:
+Steps we've taken to keep your data safe and the app running smoothly.
 
-Security:
-- Passwords are never stored in plain text—bcrypt hashes them with a random salt.
-- API routes can implement CSRF protection and input validation to block malicious requests.
-- Session tokens or cookies are marked secure and HttpOnly to prevent theft via JavaScript.
+- **Secure Authentication**
+  - Every API route checks user sessions via Better Auth, so only authorized users can read or write data.
+  - Passwords and session tokens are never exposed to the client.
 
-Performance:
-- Server-side rendering (SSR) and static site generation (SSG) in Next.js deliver pages faster.
-- Code splitting and lazy-loaded components ensure users only download what they need.
-- Global CSS and theme files are small and cached by the browser for quick repeat visits.
+- **Environment Variables**
+  - Sensitive keys (like database passwords or AI API keys) are stored outside the code in `.env` files.
+  - Vercel and local Docker setups load these securely at runtime.
 
-These strategies work together to give users a fast, secure experience every time.
+- **Input Validation & Sanitization**
+  - We use Zod (a validation library) to check AI output and user inputs before saving to the database.
+  - Prevents malformed data and guards against injection attacks.
+
+- **Performance Optimizations**
+  - Server-side rendering for faster initial page loads.
+  - Streaming chat replies for real-time feel.
+  - Tailwind’s utility approach reduces unused CSS, keeping page sizes small.
+  - Database indexing on key fields ensures quick lookups for schedules and messages.
 
 ## 6. Conclusion and Overall Tech Stack Summary
-In building **codeguide-starter**, we chose technologies that:
+- We chose **Next.js**, **React**, and **Tailwind** to build a responsive, modern user interface.
+- **Better Auth**, **PostgreSQL**, and **Drizzle ORM** form a secure, type-safe back end for storing user data and schedules.
+- **Vercel** handles hosting and deployment, while **Docker** ensures a consistent local environment.
+- Integrations like the **Vercel AI SDK**, **OpenAI**, and **Sentry** enable powerful AI chat, structured data extraction, and real-time error tracking.
+- Security measures (authentication, environment variables, validation) and performance tweaks (streaming, SSR, CSS optimization) keep the app safe and fast.
 
-- Align with modern web standards (Next.js, React, TypeScript).
-- Provide a clear, file-based project structure for rapid onboarding.
-- Offer built-in support for server-side rendering, API routes, and static assets.
-- Emphasize security through password hashing, session management, and safe defaults.
-- Enable easy scaling and future enhancements via modular code and optional integrations.
-
-This stack strikes a balance between simplicity for newcomers and flexibility for experienced teams. It accelerates development of a secure authentication flow and a polished dashboard, while leaving room to plug in databases, test suites, and advanced features as the project grows.
+Together, these technologies provide a solid, scalable foundation for the AI-powered schedule audit assistant. The stack is designed to let developers focus on adding new AI features and visualizations, knowing that user management, data storage, and deployment are already taken care of.
