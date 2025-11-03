@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Add Black Button Variant to shadcn/ui Button Component",
+    "description": "Extend the existing button component with a new 'dark' variant that provides a black background with white text and appropriate interactive states.",
+    "details": "Modify the `components/ui/button.tsx` file to add a new variant to the `buttonVariants` object using the Class Variance Authority (cva) pattern. The new variant should include: black background (`bg-black`), white text (`text-white`), hover state (`hover:bg-gray-800`), active state (`active:bg-gray-900`), focus state with ring (`focus-visible:ring-2 focus-visible:ring-gray-400`), and disabled state (`disabled:bg-gray-600 disabled:cursor-not-allowed`). Ensure the variant follows the existing naming convention and maintains consistency with other button variants in the component.",
+    "status": "pending",
+    "test_strategy": "Test the button component in isolation by rendering it with the new 'dark' variant and verifying all interactive states (default, hover, active, focus, disabled) display correctly. Check color contrast meets WCAG AA standards (minimum 4.5:1 ratio). Test keyboard navigation and screen reader compatibility.",
+    "priority": "high",
+    "ordinal": 0,
+    "task_group_id": "098714ad-e826-48bf-bd1b-d24475e155d4",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "0fb2c490-feb8-44c3-a2e8-16a4cf322719",
+    "created_at": "2025-11-03T18:44:27.241579Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Update Button Component TypeScript Interface",
+    "description": "Update the TypeScript interface and prop types to include the new 'dark' variant in the button component's type definitions.",
+    "details": "Ensure the ButtonProps interface and variant type definitions in `components/ui/button.tsx` properly include the new 'dark' variant. This may involve updating the variant union type to include 'dark' as a valid option. Verify that TypeScript intellisense works correctly when using the new variant and that no type errors are introduced. The change should maintain backward compatibility with existing button implementations.",
+    "status": "pending",
+    "test_strategy": "Verify TypeScript compilation passes without errors. Test that IDE autocomplete suggests the new 'dark' variant when typing the variant prop. Ensure existing button implementations continue to work without modification.",
+    "priority": "medium",
+    "ordinal": 1,
+    "task_group_id": "098714ad-e826-48bf-bd1b-d24475e155d4",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "697bc8d5-b32f-4491-a506-97835192a4de",
+    "created_at": "2025-11-03T18:44:27.241589Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Implement Black Button in Dashboard",
+    "description": "Add the new black button component to the dashboard page to demonstrate its usage and provide a primary action button for users.",
+    "details": "In `app/dashboard/page.tsx`, import and implement the Button component with the new 'dark' variant. Position it appropriately within the dashboard layout, potentially as a primary action button for key user workflows like 'Add Schedule Event' or 'Start New Audit'. Include an optional leading icon using `lucide-react` icons to match the design pattern shown in the visual context. Ensure the button is properly styled within the dashboard's responsive layout and maintains consistent spacing with other UI elements.",
+    "status": "pending",
+    "test_strategy": "Test the button renders correctly in the dashboard across different screen sizes (mobile, tablet, desktop). Verify the button's click handler works as expected and integrates properly with the dashboard's functionality. Test in both light and dark theme modes to ensure proper contrast and visibility.",
+    "priority": "medium",
+    "ordinal": 2,
+    "task_group_id": "098714ad-e826-48bf-bd1b-d24475e155d4",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "7f8c81e3-2792-4558-94be-ee34f8a5e6a5",
+    "created_at": "2025-11-03T18:44:27.241591Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  }
+]
