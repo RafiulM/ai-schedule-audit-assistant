@@ -1,116 +1,147 @@
-# Security Guidelines for codeguide-starter
+# Security Guidelines for ai-schedule-audit-assistant
 
-This document defines mandatory security principles and implementation best practices tailored to the **codeguide-starter** repository. It aligns with Security-by-Design, Least Privilege, Defense-in-Depth, and other core security tenets. All sections reference specific areas of the codebase (e.g., `/app/api/auth/route.ts`, CSS files, environment configuration) to ensure practical guidance.
+This document provides comprehensive security guidelines tailored to the **ai-schedule-audit-assistant** codebase. It aligns with industry best practices and the core security principles of Security by Design, Least Privilege, Defense in Depth, and Secure Defaults.
 
 ---
 
-## 1. Security by Design
+## Table of Contents
+1. Introduction and Scope
+2. Authentication & Access Control
+3. Input Handling & Processing
+4. Data Protection & Privacy
+5. API & Service Security
+6. Web Application Security Hygiene
+7. Infrastructure & Configuration Management
+8. Dependency Management
+9. Monitoring, Logging, and Incident Response
 
-• Embed security from day one: review threat models whenever adding new features (e.g., new API routes, data fetching).
-• Apply “secure defaults” in Next.js configuration (`next.config.js`), enabling strict mode and disabling debug flags in production builds.
-• Maintain a security checklist in your PR template to confirm that each change has been reviewed against this guideline.
+---
+
+## 1. Introduction and Scope
+These guidelines apply to all components of the ai-schedule-audit-assistant application, including the Next.js frontend (App Router), API routes, Drizzle ORM schemas, and deployment configurations. The goal is to ensure that user data—especially personally identifiable information (PII), schedule events, and chat history—remains secure throughout its lifecycle.
 
 ---
 
 ## 2. Authentication & Access Control
-
-### 2.1 Password Storage
-- Use **bcrypt** (or Argon2) with a per-user salt to hash passwords in `/app/api/auth/route.ts`.
-- Enforce a strong password policy on both client and server: minimum 12 characters, mixed case, numbers, and symbols.
-
-### 2.2 Session Management
-- Issue sessions via Secure, HttpOnly, SameSite=strict cookies. Do **not** expose tokens to JavaScript.
-- Implement absolute and idle timeouts. For example, invalidate sessions after 30 minutes of inactivity.
-- Protect against session fixation by regenerating session IDs after authentication.
-
-### 2.3 Brute-Force & Rate Limiting
-- Apply rate limiting at the API layer (e.g., using `express-rate-limit` or Next.js middleware) on `/api/auth` to throttle repeated login attempts.
-- Introduce exponential backoff or temporary lockout after N failed attempts.
-
-### 2.4 Role-Based Access Control (Future)
-- Define user roles in your database model (e.g., `role = 'user' | 'admin'`).
-- Enforce server-side authorization checks in every protected route (e.g., in `dashboard/layout.tsx` loader functions).
+- **Robust Authentication**
+  - Use the built-in `better-auth` system with strong password policies: minimum length 12+, complexity (uppercase, lowercase, digit, special character), and account lockout after repeated failures.
+  - Enforce multi-factor authentication (MFA) for all privileged users.
+- **Secure Session Management**
+  - Generate cryptographically strong session IDs.
+  - Set tight idle and absolute timeouts (e.g., 15 minutes idle, 8 hours absolute).
+  - Invalidate sessions on password change or logout to prevent session fixation.
+- **Role-Based Access Control (RBAC)**
+  - Define roles (e.g., `user`, `admin`) and map permissions for API routes (read/write schedules, view metrics).
+  - Perform server-side authorization checks in every API route (`/api/chat`, `/api/events`).
+  - Reject unauthorized access with HTTP 403 without revealing role details.
 
 ---
 
 ## 3. Input Handling & Processing
-
-### 3.1 Validate & Sanitize All Inputs
-- On **client** (`sign-up/page.tsx`, `sign-in/page.tsx`): perform basic format checks (email regex, password length).
-- On **server** (`/app/api/auth/route.ts`): re-validate inputs with a schema validator (e.g., `zod`, `Joi`).
-- Reject or sanitize any unexpected fields to prevent injection attacks.
-
-### 3.2 Prevent Injection
-- If you introduce a database later, always use parameterized queries or an ORM (e.g., Prisma) rather than string concatenation.
-- Avoid dynamic `eval()` or template rendering with unsanitized user input.
-
-### 3.3 Safe Redirects
-- When redirecting after login or logout, validate the target against an allow-list to prevent open redirects.
+- **Prevent Injection Attacks**
+  - Use Drizzle ORM parameterized queries—never concatenate SQL strings.
+  - On any raw query, validate inputs with Zod schemas.
+- **Server-Side Validation**
+  - Validate all user-supplied data in API routes and server actions using Zod or Joi.
+  - Reject invalid or out-of-range values with generic error messages.
+- **Prompt Injection Mitigation**
+  - Sanitize user messages before sending to the AI SDK: strip control characters, enforce a reasonable length limit (e.g., 2,000 chars).
+  - Use a whitelist of allowed fields when parsing the AI’s structured response.
+- **Secure File Handling (if applicable)**
+  - For avatar uploads or attachments, validate MIME type, extension, and file size.
+  - Store files outside of `public/` with randomized filenames and restrictive ACLs.
 
 ---
 
 ## 4. Data Protection & Privacy
-
-### 4.1 Encryption & Secrets
-- Enforce HTTPS/TLS 1.2+ for all front-end ↔ back-end communications.
-- Never commit secrets—use environment variables and a secrets manager (e.g., AWS Secrets Manager, Vault).
-
-### 4.2 Sensitive Data Handling
-- Do ​not​ log raw passwords, tokens, or PII in server logs. Mask or redact any user identifiers.
-- If storing PII in `data.json` or a future database, classify it and apply data retention policies.
+- **Encryption in Transit**
+  - Enforce HTTPS/TLS 1.2+ for all front-end and API traffic. Redirect HTTP to HTTPS.
+  - Use HSTS (`Strict-Transport-Security`) with a long max-age in production.
+- **Encryption at Rest**
+  - Enable database-level encryption for PostgreSQL.
+  - Encrypt backups and snapshots in the cloud provider.
+- **Secrets Management**
+  - Store API keys (OpenAI, database credentials) in a secrets vault or environment variables—not in source code.
+  - Rotate secrets regularly and on any suspected compromise.
+- **Sensitive Data Handling**
+  - Hash user passwords with Argon2id or bcrypt and a unique per-user salt.
+  - Mask or truncate PII in logs (e.g., email addresses, schedule descriptions).
+  - Comply with GDPR/CCPA: implement user data export and deletion endpoints.
 
 ---
 
 ## 5. API & Service Security
-
-### 5.1 HTTPS Enforcement
-- In production, redirect all HTTP traffic to HTTPS (e.g., via Vercel’s redirect rules or custom middleware).
-
-### 5.2 CORS
-- Configure `next.config.js` or API middleware to allow **only** your front-end origin (e.g., `https://your-domain.com`).
-
-### 5.3 API Versioning & Minimal Exposure
-- Version your API routes (e.g., `/api/v1/auth`) to handle future changes without breaking clients.
-- Return only necessary fields in JSON responses; avoid leaking internal server paths or stack traces.
+- **Endpoint Protection**
+  - Require authentication for all `/api/*` routes.
+  - Return minimal error details (e.g., “Unauthorized” vs. stack traces).
+- **Rate Limiting & Throttling**
+  - Implement IP-based and user-based rate limiting (e.g., 100 requests/minute) to mitigate abuse.
+- **CORS Policy**
+  - Restrict allowed origins to the official domain(s).
+  - Enable `Access-Control-Allow-Credentials` only if necessary, and never allow wildcard origins with credentials.
+- **HTTP Method Enforcement**
+  - Use `GET` for reads, `POST` for creations, `PATCH` for updates, and `DELETE` for removals.
+- **API Versioning**
+  - Namespace critical endpoints under `/api/v1/` to allow controlled upgrades.
 
 ---
 
 ## 6. Web Application Security Hygiene
-
-### 6.1 CSRF Protection
-- Use anti-CSRF tokens for any state-changing API calls. Integrate Next.js CSRF middleware or implement synchronizer tokens stored in cookies.
-
-### 6.2 Security Headers
-- In `next.config.js` (or a custom server), add these headers:
-  - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
-  - `X-Content-Type-Options: nosniff`
-  - `X-Frame-Options: DENY`
-  - `Referrer-Policy: no-referrer-when-downgrade`
-  - `Content-Security-Policy`: restrict script/style/src to self and trusted CDNs.
-
-### 6.3 Secure Cookies
-- Set `Secure`, `HttpOnly`, `SameSite=Strict` on all cookies. Avoid storing sensitive data in `localStorage`.
-
-### 6.4 Prevent XSS
-- Escape or encode all user-supplied data in React templates. Avoid `dangerouslySetInnerHTML` unless content is sanitized.
+- **Security Headers**
+  - Content-Security-Policy: restrict scripts, styles, and frames.
+  - X-Content-Type-Options: `nosniff`.
+  - X-Frame-Options: `DENY` or CSP `frame-ancestors 'none'`.
+  - Referrer-Policy: `strict-origin-when-cross-origin`.
+- **CSRF Protection**
+  - Implement anti-CSRF tokens for state-changing form submissions and API calls.
+- **Secure Cookies**
+  - Set `HttpOnly`, `Secure`, and `SameSite=Strict` for session cookies.
+- **Client-Side Storage**
+  - Avoid storing tokens or sensitive data in localStorage/sessionStorage.
+  - Use cookies with the above attributes instead.
+- **Subresource Integrity**
+  - Add SRI hashes for any CDN-hosted scripts or styles.
 
 ---
 
 ## 7. Infrastructure & Configuration Management
-
-- Harden your hosting environment (e.g., Vercel/Netlify) by disabling unnecessary endpoints (GraphQL/GraphiQL playgrounds in production).
-- Rotate secrets and API keys regularly via your secrets manager.
-- Maintain minimal privileges: e.g., database accounts should only have read/write on required tables.
-- Keep Node.js, Next.js, and all system packages up to date.
+- **Server Hardening**
+  - Disable all unnecessary ports and services on the database and application servers.
+  - Enforce least-privilege on OS users and database roles.
+- **TLS Configuration**
+  - Use strong cipher suites (e.g., ECDHE, AES-GCM).
+  - Disable SSLv3, TLS 1.0, and TLS 1.1.
+- **Secure Defaults**
+  - Ensure Docker containers run with non-root users.
+  - Default feature flags to “off” for new functionality.
+- **Software Updates**
+  - Regularly patch the OS, Next.js, Node.js, and all dependencies.
+  - Automate security updates where feasible.
 
 ---
 
 ## 8. Dependency Management
-
-- Commit and maintain `package-lock.json` to guarantee reproducible builds.
-- Integrate a vulnerability scanner (e.g., GitHub Dependabot, Snyk) to monitor and alert on CVEs in dependencies.
-- Trim unused packages; each added library increases the attack surface.
+- **Use Trusted Libraries**
+  - Select well-maintained NPM packages for React, Drizzle, and the AI SDK.
+- **Lockfiles & Audits**
+  - Commit `package-lock.json` and run `npm audit` in CI pipelines.
+  - Block merges with critical or high-severity vulnerabilities.
+- **Minimize Footprint**
+  - Remove unused dependencies and code to reduce attack surface.
 
 ---
 
-Adherence to these guidelines will ensure that **codeguide-starter** remains secure, maintainable, and resilient as it evolves. Regularly review and update this document to reflect new threats and best practices.
+## 9. Monitoring, Logging, and Incident Response
+- **Centralized Logging**
+  - Send application logs (errors, warnings) to a secure aggregator (e.g., Sentry, Datadog).
+  - Mask sensitive fields before logging.
+- **Alerts & Metrics**
+  - Monitor auth failures, rate-limit triggers, and error rates.
+  - Set up alerts for unusual patterns (e.g., burst of 401s or 5xx errors).
+- **Incident Response**
+  - Define a runbook for security incidents: detection, containment, eradication, recovery.
+  - Perform post-mortem reviews and rotate compromised credentials.
+
+---
+
+By following these guidelines, the ai-schedule-audit-assistant codebase will maintain a robust security posture, protect user privacy, and ensure the integrity of schedule data and AI chat interactions. Regular reviews and updates to these practices will help defend against evolving threats.

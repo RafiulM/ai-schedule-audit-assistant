@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Locate API Keys Page Component",
+    "description": "Find the React component file that contains the API keys page header text that needs to be updated from 'Your API Keys' to 'API Keys'.",
+    "details": "Use project-wide text search (grep, VS Code search, or IDE search functionality) to locate the string 'Your API Keys' within the codebase. Based on the Next.js App Router structure, this is likely in a page component within the app/dashboard/ directory, such as app/dashboard/settings/api-keys/page.tsx or similar. Document the exact file path and line number where the header text is located.",
+    "status": "pending",
+    "test_strategy": "Verify the search results by opening the identified file and confirming it contains the target header text within a JSX heading element (h1, h2, etc.).",
+    "priority": "high",
+    "ordinal": 0,
+    "task_group_id": "2acd1c93-9a07-4e76-a754-26826c025bf6",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "824a5641-0ffd-4618-adea-7780ababf65d",
+    "created_at": "2025-11-03T15:44:49.903442Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Update Header Text Content",
+    "description": "Modify the header text from 'Your API Keys' to 'API Keys' in the identified React component file.",
+    "details": "Open the component file identified in the previous task. Locate the JSX heading element (likely <h1>, <h2>, or similar) that renders 'Your API Keys'. Change the text content to 'API Keys'. If the text is stored in a variable or constant, update that instead. Ensure no other references to the old text exist in the same file. Save the changes and verify the syntax is correct.",
+    "status": "pending",
+    "test_strategy": "Run the development server locally and navigate to the API keys page to visually confirm the header now displays 'API Keys' instead of 'Your API Keys'.",
+    "priority": "high",
+    "ordinal": 1,
+    "task_group_id": "2acd1c93-9a07-4e76-a754-26826c025bf6",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "8f97380a-a15d-42c9-9d44-cc87b7c0fb5e",
+    "created_at": "2025-11-03T15:44:49.903447Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Verify Layout and Styling",
+    "description": "Ensure the header text change doesn't break the page layout or styling and maintains consistency with the design system.",
+    "details": "After making the text change, thoroughly test the API keys page in both light and dark themes. Check that the shorter header text doesn't cause any layout shifts, alignment issues, or styling problems. Verify the text maintains proper typography, spacing, and visual hierarchy. Test on different screen sizes to ensure responsive behavior is maintained. Compare with other page headers in the dashboard to ensure consistency.",
+    "status": "pending",
+    "test_strategy": "Manual testing across different browsers, screen sizes, and theme modes. Take screenshots before and after the change to compare layout consistency.",
+    "priority": "medium",
+    "ordinal": 2,
+    "task_group_id": "2acd1c93-9a07-4e76-a754-26826c025bf6",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "5a1656d6-8d07-4716-8cbd-b337db57bc98",
+    "created_at": "2025-11-03T15:44:49.903449Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  }
+]
