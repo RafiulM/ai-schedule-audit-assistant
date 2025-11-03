@@ -1,179 +1,160 @@
 # Backend Structure Document
 
-This document outlines the backend architecture, hosting, and infrastructure for the **codeguide-starter** project. It uses plain language so anyone can understand how the backend is set up and how it supports the application.
+This document describes the backend setup for the **ai-schedule-audit-assistant** project. It explains how the system is built, how data moves through it, and how everything is hosted and secured. You don’t need a deep technical background to understand it.
 
 ## 1. Backend Architecture
 
-- **Framework and Design Pattern**
-  - We use **Next.js API Routes** to handle all server-side logic. These routes live alongside the frontend code in the same repository, making development and deployment simpler.
-  - The backend follows a **layered pattern**:
-    1. **API Layer**: Receives requests (login, registration, data fetch).  
-    2. **Service Layer**: Contains the core business logic (user validation, password hashing).  
-    3. **Data Access Layer**: Talks to the database via a simple ORM (e.g., Prisma or TypeORM).
+**Overall Design**
+- The backend is built on **Next.js** (App Router) using both server and client components.
+- Business logic and data access live in **API routes** and **Server Actions**, keeping frontend pages clean and focused on presentation.
+- **Drizzle ORM** is used for talking to the database in a type-safe way, so code errors are caught early.
 
-- **Scalability**
-  - Stateless API routes can scale horizontally—new instances can spin up on demand.  
-  - We can add caching or a message queue (e.g., Redis or RabbitMQ) without changing the core code.
-
-- **Maintainability**
-  - Code for each feature is grouped by route (authentication, dashboard).  
-  - A service layer separates complex logic from request handling.
-
-- **Performance**
-  - Lightweight Node.js handlers keep response times low.  
-  - Future use of database connection pooling and Redis for caching repeated queries.
+**Key Benefits**
+- Scalability: Next.js runs serverless functions on demand, automatically handling traffic spikes.
+- Maintainability: Clear separation between API endpoints, database schemas, and UI components makes it easy to add or change features.
+- Performance: Streaming AI responses directly from server functions keeps the chat interface snappy. Static assets and pages can be cached at the edge by the CDN.
 
 ## 2. Database Management
 
-- **Database Choice**
-  - We recommend **PostgreSQL** for structured data and reliable transactions.  
-  - In-memory caching can be added later with **Redis** for session tokens or frequently read data.
+**Technology**
+- **PostgreSQL** (SQL database) for storing users, chat history, and schedule data.
+- **Drizzle ORM** for defining schemas in code, running migrations, and querying data.
+- Local development uses a **Docker container** replicating production settings.
 
-- **Data Storage and Access**
-  - Use an ORM like **Prisma** or **TypeORM** to map JavaScript/TypeScript objects to database tables.
-  - Connection pooling ensures efficient use of database connections under load.
-  - Migrations track schema changes over time, keeping development, staging, and production in sync.
-
-- **Data Practices**
-  - Passwords are never stored in plain text—they are salted and hashed with **bcrypt** before saving.
-  - All outgoing data is typed and validated to prevent malformed records.
+**How Data Is Handled**
+- Data is organized into tables (users, messages, events).
+- The ORM ensures that every record follows a predefined structure (type safety).
+- Migrations keep schema changes in version control, so each developer and the production server stay in sync.
 
 ## 3. Database Schema
 
-### Human-Readable Format
+All tables sit in the same PostgreSQL database. Here’s a human-friendly view, followed by SQL you could run to create them.
 
-- **Users**
-  - **id**: Unique identifier  
-  - **email**: User’s email address (unique)  
-  - **password_hash**: Securely hashed password  
-  - **created_at**: Account creation timestamp
-
-- **Sessions**
-  - **id**: Unique session record  
-  - **user_id**: Links to a user  
-  - **token**: Random string for authentication  
-  - **expires_at**: When the token stops working  
-  - **created_at**: When the session was created
-
-- **DashboardItems** *(optional for dynamic data)*
-  - **id**: Unique record  
-  - **title**: Item title  
-  - **content**: Item details  
-  - **created_at**: When the item was added
+### Human-Readable Schema
+- **Users** store basic account info.
+- **Chat Messages** record each message with its role (user or assistant) and timestamp.
+- **Schedule Events** store individual calendar entries with title, start, and end times.
+- **Categories** (optional) let users tag events (e.g., “Work,” “Exercise”).
 
 ### SQL Schema (PostgreSQL)
+
 ```sql
--- Users table
+-- Users
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
+  email TEXT UNIQUE NOT NULL,
+  name TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Sessions table
-CREATE TABLE sessions (
+-- Chat history
+CREATE TABLE chat_messages (
   id SERIAL PRIMARY KEY,
-  user_id INT REFERENCES users(id) ON DELETE CASCADE,
-  token VARCHAR(255) UNIQUE NOT NULL,
-  expires_at TIMESTAMPTZ NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user','assistant')),
+  content TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Dashboard items table
-CREATE TABLE dashboard_items (
+-- Schedule events
+CREATE TABLE schedule_events (
   id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
-  content TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Event categories (optional)
+CREATE TABLE categories (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  color TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ```  
 
 ## 4. API Design and Endpoints
 
-- **Approach**: We follow a **RESTful** style, grouping related endpoints under `/api` directories.
+We follow a **RESTful** style, where each endpoint does one clear job. All endpoints check the logged-in user before returning or changing data.
 
-- **Key Endpoints**
-  - `POST /api/auth/register`  
-    • Accepts `{ email, password }`  
-    • Creates a new user and issues a session token  
-  - `POST /api/auth/login`  
-    • Accepts `{ email, password }`  
-    • Verifies credentials and returns a session token  
-  - `POST /api/auth/logout`  
-    • Invalidates the session token on the server  
-  - `GET /api/dashboard/data`  
-    • Requires a valid session  
-    • Returns user-specific data or dashboard items  
+- **Authentication** (`/api/auth/*`)
+  - Handled by Better Auth to sign users in and out, manage sessions.
 
-- **Communication**
-  - Frontend sends JSON requests; backend replies with JSON and appropriate HTTP status codes.  
-  - Protected routes check for a valid session token (in cookies or Authorization header).
+- **Chat Endpoint** (`POST /api/chat`)
+  - Receives the user’s message.
+  - Calls the Vercel AI SDK to generate a reply.
+  - Parses any schedule details from the AI response and saves them to the database.
+  - Streams the AI’s conversational reply back to the frontend.
+
+- **Get Events** (`GET /api/schedule/events`)
+  - Returns all calendar entries for the current user.
+
+- **Create Event** (`POST /api/schedule/events`)
+  - Allows manual event creation (title, start, end).
+  - Validates input and stores it in the database.
+
+- **Get Metrics** (`GET /api/metrics`)
+  - Calculates totals like hours per category.
+  - Returns data for dashboard charts.
 
 ## 5. Hosting Solutions
 
-- **Cloud Provider**:  
-  - **Vercel** (recommended) offers seamless Next.js deployments, auto-scaling, and built-in CDN.  
-  - Alternatively, **Netlify** or any Node.js-capable host will work.
-
-- **Benefits**
-  - **Reliability**: Global servers and failover across regions.  
-  - **Scalability**: Auto-scale serverless functions based on traffic.  
-  - **Cost-Effectiveness**: Pay-per-use model means low cost for small projects.
+- **Vercel** is used to host the Next.js app. Key benefits:
+  - **Serverless Functions**: API routes and Server Actions auto-scale.
+  - **Global CDN**: Static assets and server-rendered pages are cached close to users.
+  - **Zero-Config SSL**: Secure HTTPS by default.
+  - **Easy Deploys**: Connect to GitHub; every push can create a preview or production deployment.
+- **Docker (Local)**: Developers run a local PostgreSQL instance that matches production, ensuring consistency.
 
 ## 6. Infrastructure Components
 
-- **Load Balancer**
-  - Provided by the hosting platform—distributes API requests across function instances.
-
+- **Load Balancer & Edge Network**
+  - Vercel handles traffic routing and spreads requests across its edge servers.
 - **CDN (Content Delivery Network)**
-  - Vercel’s global edge network caches static assets (CSS, JS, images) for faster page loads.
-
+  - Delivers static files (JS, CSS, images) from locations near the end user.
 - **Caching**
-  - **Redis** (optional) for session storage or caching dashboard queries to reduce database load.
-
-- **Object Storage**
-  - For file uploads or backups, integrate with AWS S3 or similar services.
-
-- **Message Queue**
-  - In future, use **RabbitMQ** or **Kafka** for background tasks (e.g., email notifications).
+  - HTTP headers on API responses and pages enable edge caching of repeated requests.
+  - Drizzle query caching layers can be added to speed up repeated database queries (optional).
 
 ## 7. Security Measures
 
 - **Authentication & Authorization**
-  - Passwords hashed with **bcrypt** and salted.  
-  - Session tokens stored in secure, HttpOnly cookies or Authorization headers.  
-  - Protected endpoints verify tokens before proceeding.
-
+  - Better Auth manages secure login flows, session cookies, and CSRF protection.
+  - Every API route checks the user’s session and only returns that user’s data.
 - **Data Encryption**
-  - **HTTPS/TLS** encrypts data in transit.  
-  - Database connections use SSL to encrypt data between the app and the database.
-
-- **Input Validation**
-  - Every incoming request is validated (e.g., valid email format, password length) to prevent SQL injection or other attacks.
-
-- **Web Security Best Practices**
-  - Enable **CORS** policies to limit allowed origins.  
-  - Use **CSRF tokens** or same-site cookies to prevent cross-site requests.  
-  - Set secure headers with **Helmet** or a similar middleware.
+  - TLS/HTTPS encrypts data in transit.
+  - For production, the database service typically offers encryption at rest.
+- **Input Validation & Sanitization**
+  - API route handlers check and clean incoming data to prevent injection attacks.
+  - AI prompt inputs are sanitized to stop prompt injection.
+- **Environment Variables**
+  - Secrets (database URL, AI provider keys) live in environment variables, never in code.
 
 ## 8. Monitoring and Maintenance
 
+- **Logging & Error Tracking**
+  - Use **Sentry** (or similar) to capture and alert on runtime errors in serverless functions.
+  - Vercel’s built-in logs show request details and function execution times.
 - **Performance Monitoring**
-  - Integrate **Sentry** or **LogRocket** for real-time crash reporting and performance tracing.  
-  - Use Vercel’s built-in analytics to track request latencies and error rates.
-
-- **Logging**
-  - Structured logs (JSON) for all API requests and errors, shipped to a log management service like **Datadog** or **Logflare**.
-
-- **Health Checks**
-  - Define a `/health` endpoint that returns a 200 status if the service is up and the database is reachable.
-
-- **Maintenance Strategies**
-  - Automated migrations run on deploy to keep the database schema up to date.  
-  - Scheduled dependency audits and security scans (e.g., `npm audit`).
-  - Regular backups of the database (daily or weekly depending on usage).
+  - Vercel Analytics for traffic, latency, and error rates.
+  - Database dashboards or tools (e.g., pgAdmin) track query performance and resource usage.
+- **Backups & Migrations**
+  - Drizzle migrations are version-controlled; running `drizzle migrate` updates the schema safely.
+  - Regular automated backups of the PostgreSQL database.
+- **Continuous Integration**
+  - GitHub Actions (or similar) run linting, type checks, and tests on every pull request.
 
 ## 9. Conclusion and Overall Backend Summary
 
-The backend for **codeguide-starter** is built on Next.js API Routes and Node.js, paired with PostgreSQL for data and optional Redis for caching. It follows a clear layered architecture that keeps code easy to maintain and extend. With RESTful endpoints for authentication and data, secure practices like password hashing and HTTPS, and hosting on Vercel for scalability and global performance, this setup meets the project’s goals for a fast, secure, and developer-friendly foundation. Future enhancements—such as background job queues, advanced monitoring, or richer data models—can be added without disrupting the core structure.
+The **ai-schedule-audit-assistant** backend is built for reliability, scalability, and clarity. By combining Next.js serverless functions, a type-safe ORM, and a managed SQL database, it:
+
+- Secures user data with a proven authentication system.
+- Processes AI-driven chat in real time, extracting and storing structured schedule events.
+- Scales seamlessly on Vercel’s global edge network.
+- Provides clear, modular code that’s easy to maintain and extend.
+
+This setup ensures that as user needs grow—more chat features, richer analytics, or new integrations—the backend can evolve without major rewrites.
