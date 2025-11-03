@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Define destructive color variant in design system",
+    "description": "Add red color definitions to the design system by defining CSS variables and extending the Tailwind theme configuration to support a destructive button variant.",
+    "details": "First, add destructive color CSS variables to app/globals.css using HSL values that provide good contrast (e.g., --destructive: 0 84% 60%; --destructive-foreground: 210 40% 98%;). Then extend the tailwind.config.ts theme to include these colors in the destructive property. This establishes the foundation for the red button styling while maintaining consistency with the shadcn/ui design system approach.",
+    "status": "pending",
+    "test_strategy": "Verify CSS variables are properly defined by inspecting computed styles in browser dev tools. Test that Tailwind classes like bg-destructive and text-destructive-foreground are available and render the expected red colors.",
+    "priority": "high",
+    "ordinal": 0,
+    "task_group_id": "28383ace-a876-4ecf-b8d6-8cb6df163a38",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "94c97f9e-f860-47b9-8759-06daaea30acf",
+    "created_at": "2025-11-03T15:26:47.274740Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Add destructive variant to Button component",
+    "description": "Extend the shadcn/ui Button component by adding a new 'destructive' variant to the buttonVariants configuration that uses the red color scheme.",
+    "details": "Modify components/ui/button.tsx to add a 'destructive' variant to the buttonVariants object using class-variance-authority (cva). The variant should apply bg-destructive, text-destructive-foreground, and appropriate hover states (hover:bg-destructive/90). Ensure the variant follows the same pattern as existing variants and maintains proper TypeScript typing by updating the ButtonProps interface if needed.",
+    "status": "pending",
+    "test_strategy": "Create a test component or story to render the button with variant='destructive' and verify it displays with red background and proper contrast. Test hover states and ensure no style conflicts with other variants.",
+    "priority": "medium",
+    "ordinal": 1,
+    "task_group_id": "28383ace-a876-4ecf-b8d6-8cb6df163a38",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "02653d51-cde4-433a-8402-5f7b8e5230e8",
+    "created_at": "2025-11-03T15:26:47.274748Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Apply destructive variant to Create New Key button",
+    "description": "Update the 'Create New Key' button implementation to use the new destructive variant, changing its appearance from blue to red.",
+    "details": "Locate the 'Create New Key' button component (likely in app/dashboard/ or a related API key management page) and modify the Button component to use variant='destructive' instead of the current variant. Ensure the button text and any icons maintain proper contrast and readability. Consider adding a brief comment explaining the color choice if it deviates from typical UX patterns (since red usually indicates destructive actions).",
+    "status": "pending",
+    "test_strategy": "Manually test the button renders with red background in both light and dark themes. Verify the button is still clickable and maintains proper accessibility standards. Use a color contrast checker to ensure WCAG AA compliance for text readability.",
+    "priority": "medium",
+    "ordinal": 2,
+    "task_group_id": "28383ace-a876-4ecf-b8d6-8cb6df163a38",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "34e351c5-17b2-476f-995c-e3f06ace58cf",
+    "created_at": "2025-11-03T15:26:47.274750Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  }
+]
