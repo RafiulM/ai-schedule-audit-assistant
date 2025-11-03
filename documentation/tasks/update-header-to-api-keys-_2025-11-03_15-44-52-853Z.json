@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Update API Keys Page Header Text",
+    "description": "Modify the header text on the API Keys management page from 'Your API Keys' to 'API Keys' to improve clarity and align with common application terminology.",
+    "details": "Locate the API Keys page component file (likely at app/dashboard/settings/api-keys/page.tsx or similar path within the dashboard directory). Find the hardcoded string 'Your API Keys' which is likely within an <h2> tag or passed as a prop to a CardHeader component from shadcn/ui. Replace the text with 'API Keys'. If the application uses internationalization (i18n), check if the text is stored in a translation file (e.g., locales/en.json) and update the corresponding key instead. Ensure the change maintains proper spacing and typography consistency with the existing design.",
+    "status": "pending",
+    "test_strategy": "Run the development server (npm run dev) and navigate to the API Keys page to visually verify the header text has changed from 'Your API Keys' to 'API Keys'. Confirm that the layout remains intact and the text styling is consistent with other page headers. Check that no other pages are affected if the header component is reused elsewhere.",
+    "priority": "medium",
+    "ordinal": 0,
+    "task_group_id": "c7761f1e-9320-478b-b513-7a7c6a705712",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "b7fb6378-48d0-4740-ad82-d3cf72c29a63",
+    "created_at": "2025-11-03T15:44:47.610432Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Update Test Cases for Header Text Change",
+    "description": "Update any automated test cases that assert the presence of the old header text 'Your API Keys' to reflect the new text 'API Keys'.",
+    "details": "Search the codebase for any test files (Jest unit tests, component snapshot tests, or end-to-end tests with Playwright/Cypress) that contain assertions checking for 'Your API Keys' text. Update these test cases to expect 'API Keys' instead. Common locations include __tests__ directories, .test.tsx files, or e2e test directories. If snapshot tests exist for the API Keys page component, regenerate the snapshots to reflect the updated text. Ensure all tests pass after the changes.",
+    "status": "pending",
+    "test_strategy": "Run the full test suite (npm test or npm run test:e2e) to ensure all tests pass with the updated assertions. Verify that no tests are failing due to the header text change. If snapshot tests are present, confirm they have been properly updated and committed.",
+    "priority": "medium",
+    "ordinal": 1,
+    "task_group_id": "c7761f1e-9320-478b-b513-7a7c6a705712",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "a31f5794-4cae-4094-9af6-ce506492122d",
+    "created_at": "2025-11-03T15:44:47.610444Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  }
+]

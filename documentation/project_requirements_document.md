@@ -1,117 +1,107 @@
-# Project Requirements Document: codeguide-starter
-
----
+# Project Requirements Document
 
 ## 1. Project Overview
 
-The **codeguide-starter** project is a boilerplate web application that provides a ready-made foundation for any web project requiring secure user authentication and a post-login dashboard. It sets up the common building blocks—sign-up and sign-in pages, API routes to handle registration and login, and a simple dashboard interface driven by static data. By delivering this skeleton, it accelerates development time and ensures best practices are in place from day one.
+This project is an AI-powered schedule and time audit assistant built as a web application. It lets users talk naturally to an AI chatbot about their day, automatically extracts events (like meetings or tasks), and stores them in a personal calendar. Users can then switch to a calendar view to see their schedule laid out in daily, weekly, or monthly formats, and review basic productivity metrics such as total hours spent per category.
 
-This starter kit is being built to solve the friction developers face when setting up repeated common tasks: credential handling, session management, page routing, and theming. Key objectives include: 1) delivering a fully working authentication flow (registration & login), 2) providing a gated dashboard area upon successful login, 3) establishing a clear, maintainable project structure using Next.js and TypeScript, and 4) demonstrating a clean theming approach with global and section-specific CSS. Success is measured by having an end-to-end login journey in under 200 lines of code and zero runtime type errors.
+We’re building this tool to help people understand and improve how they spend their time without manual entry. By combining a conversational interface with automated data extraction and visualization, the app removes friction from time tracking. Success for the first version means: users can sign up and log in, chat to add or update events, view those events in a calendar, and see summary cards with simple time metrics. The AI extraction must be accurate enough that users rarely need to correct parsed events.
 
 ---
 
 ## 2. In-Scope vs. Out-of-Scope
 
-### In-Scope (Version 1)
-- User registration (sign-up) form with validation
-- User login (sign-in) form with validation
-- Next.js API routes under `/api/auth/route.ts` handling:
-  - Credential validation
-  - Password hashing (e.g., bcrypt)
-  - Session creation or JWT issuance
-- Protected dashboard pages under `/dashboard`:
-  - `layout.tsx` wrapping dashboard content
-  - `page.tsx` rendering static data from `data.json`
-- Global application layout in `/app/layout.tsx`
-- Basic styling via `globals.css` and `dashboard/theme.css`
-- TypeScript strict mode enabled
+### In-Scope (First Version)
+- User sign-up, login, logout, and session management via Better Auth
+- Protected dashboard layout where only signed-in users can access data
+- Real-time chat interface using `assistant-ui` and `@ai-sdk/react`
+- Backend API route (`/api/chat`) that sends prompts to the Vercel AI SDK, streams responses, and returns structured event objects
+- Automatic extraction of event details (title, start/end times) and saving them to PostgreSQL via Drizzle ORM
+- Calendar view built with a library like `react-big-calendar` to display stored events
+- Simple metric cards showing total hours per day or category
+- Light/dark theme switcher
+- Local development setup with Docker for PostgreSQL
+- Type-safe schemas for users, chat messages, and schedule events (using Drizzle + Zod)
 
 ### Out-of-Scope (Later Phases)
-- Integration with a real database (PostgreSQL, MongoDB, etc.)
-- Advanced authentication flows (password reset, email verification, MFA)
-- Role-based access control (RBAC)
-- Multi-tenant or white-label theming
-- Unit, integration, or end-to-end testing suites
-- CI/CD pipeline and production deployment scripts
+- Integration with external calendars (e.g., Google Calendar, Outlook)
+- Payment, subscription, or tiered access
+- Advanced analytics or forecasting beyond basic time sums
+- Mobile-specific UI or native mobile apps
+- Team or multi-user shared calendars
+- Custom AI model training or fine-tuning
+- Offline functionality or local storage
+- Detailed role-based permissions beyond one user = one account
 
 ---
 
 ## 3. User Flow
 
-A new visitor lands on the root URL and sees a welcome page with options to **Sign Up** or **Sign In**. If they choose Sign Up, they fill in their email, password, and hit “Create Account.” The form submits to `/api/auth/route.ts`, which hashes the password, creates a new user session or token, and redirects them to the dashboard. If any input is invalid, an inline error message explains the issue (e.g., “Password too short”).
+A new user arrives on the landing page and is prompted to sign up with email and password. After confirming their email and logging in, they land on the main dashboard. Here, they see a chat window at the center and a collapsible sidebar on the left for navigating between “Chat” and “Calendar.” A theme toggle sits in the top-right corner.
 
-Once authenticated, the user is taken to the `/dashboard` route. Here they see a sidebar or header defined by `dashboard/layout.tsx`, and the main panel pulls in static data from `data.json`. They can log out (if that control is present), but otherwise their entire session is managed by server-side cookies or tokens. Returning users go directly to Sign In, submit credentials, and upon success they land back on `/dashboard`. Any unauthorized access to `/dashboard` redirects back to Sign In.
+In the Chat view, the user types things like “I had a team meeting today from 10 to 11 and worked on reports from 11:30 to 1.” The chat UI sends their message to `/api/chat`. The backend calls the Vercel AI SDK, which returns a structured list of events. Those events are validated against a Zod schema and saved to the database. The AI’s reply appears in the chat pane. Next, the user clicks “Calendar” in the sidebar, sees their newly created events laid out, and bounces between daily, weekly, and monthly modes. Below the calendar, a row of cards shows total hours worked and other simple metrics for the selected date range.
 
 ---
 
 ## 4. Core Features
 
-- **Sign-Up Page (`/app/sign-up/page.tsx`)**: Form fields for email & password, client-side validation, POST to `/api/auth`.
-- **Sign-In Page (`/app/sign-in/page.tsx`)**: Form fields for email & password, client-side validation, POST to `/api/auth`.
-- **Authentication API (`/app/api/auth/route.ts`)**: Handles both registration and login based on HTTP method, integrates password hashing (bcrypt) and session or JWT logic.
-- **Global Layout (`/app/layout.tsx` + `globals.css`)**: Shared header, footer, and CSS resets across all pages.
-- **Dashboard Layout (`/app/dashboard/layout.tsx` + `dashboard/theme.css`)**: Sidebar or top nav for authenticated flows, section-specific styling.
-- **Dashboard Page (`/app/dashboard/page.tsx`)**: Reads `data.json`, renders it as cards or tables.
-- **Static Data Source (`/app/dashboard/data.json`)**: Example dataset to demo dynamic rendering.
-- **TypeScript Configuration**: `tsconfig.json` with strict mode and path aliases (if any).
+- **Authentication**: Register, login, logout with secure sessions (Better Auth).
+- **Protected Dashboard**: Only authenticated users can reach `/dashboard` and its sub-routes.
+- **AI Chat Component**: Built with `assistant-ui` and `@ai-sdk/react`, supporting streaming responses.
+- **Chat API Route**: `/api/chat` handles incoming prompts, calls Vercel AI SDK, extracts structured events, and returns both AI text and parsed data.
+- **Event Extraction Pipeline**: Uses Zod schemas to validate AI output, then saves events via Drizzle ORM into PostgreSQL.
+- **Calendar View**: React component (e.g., `react-big-calendar`) displaying events; supports daily/weekly/monthly toggles.
+- **Metric Cards**: Reusable component showing total time per category or day.
+- **Theme Switcher**: Toggles light/dark mode across the UI.
+- **Data Models**: Drizzle ORM schemas for `User`, `ChatMessage`, and `ScheduleEvent`.
+- **Local Database Setup**: Docker Compose configuration for PostgreSQL mirroring production.
+- **Error Handling & Logging**: Basic try/catch in API routes, console logs for now (later integrate Sentry).
 
 ---
 
 ## 5. Tech Stack & Tools
 
-- **Framework**: Next.js (App Router) for file-based routing, SSR/SSG, and API routes.
-- **Language**: TypeScript for type safety.
-- **UI Library**: React 18 for component-based UI.
-- **Styling**: Plain CSS via `globals.css` (global reset) and `theme.css` (sectional styling). Can easily migrate to CSS Modules or Tailwind in the future.
-- **Backend**: Node.js runtime provided by Next.js API routes.
-- **Password Hashing**: bcrypt (npm package).
-- **Session/JWT**: NextAuth.js or custom JWT logic (to be decided in implementation).
-- **IDE & Dev Tools**: VS Code with ESLint, Prettier extensions. Optionally, Cursor.ai for AI-assisted coding.
+- **Frontend**: Next.js (App Router), React 18, TypeScript
+- **Styling & UI Library**: Tailwind CSS, shadcn/ui component primitives
+- **AI Integration**: Vercel AI SDK (GPT-4o), `assistant-ui`, `@ai-sdk/react`
+- **Authentication**: Better Auth (session-based)
+- **Backend**: Next.js API Routes & Server Actions
+- **Database**: PostgreSQL (Docker), Drizzle ORM for type-safe schemas
+- **Validation**: Zod (for AI output and request bodies)
+- **Deployment**: Vercel (with automatic CI/CD)
+- **IDE/Plugins**: VS Code, Cursor AI, Windsurf
 
 ---
 
 ## 6. Non-Functional Requirements
 
-- **Performance**: Initial page load under 200 ms on a standard broadband connection. API responses under 300 ms.
-- **Security**:
-  - HTTPS only in production.
-  - Proper CORS, CSRF protection for API routes.
-  - Secure password storage (bcrypt with salt).
-  - No credentials or secrets checked into version control.
-- **Scalability**: Structure must support adding database integration, caching layers, and advanced auth flows without rewiring core app.
-- **Usability**: Forms should give real-time feedback on invalid input. Layout must be responsive (mobile > 320 px).
-- **Maintainability**: Code must adhere to TypeScript strict mode. Linting & formatting enforced by ESLint/Prettier.
+- **Performance**: AI responses streamed back in under 2 seconds; page navigation under 1 second.
+- **Security**: All traffic over HTTPS; OWASP Top 10 best practices; sanitize inputs to prevent injection.
+- **Compliance**: GDPR-ready (users can delete their data); secure storage of personally identifiable information.
+- **Accessibility**: WCAG 2.1 AA compliance for core flows (keyboard navigation, ARIA roles).
+- **Scalability & Availability**: Target 99.9% uptime on Vercel; support 1,000 concurrent users in Phase 1.
+- **Maintainability**: 80% unit test coverage for parsing and data-mapping logic; clear component boundaries.
 
 ---
 
 ## 7. Constraints & Assumptions
 
-- **No Database**: Dashboard uses only `data.json`; real database integration is deferred.
-- **Node Version**: Requires Node.js >= 14.
-- **Next.js Version**: Built on Next.js 13+ App Router.
-- **Authentication**: Assumes availability of bcrypt or NextAuth.js at implementation time.
-- **Hosting**: Targets serverless or Node.js-capable hosting (e.g., Vercel, Netlify).
-- **Browser Support**: Modern evergreen browsers; no IE11 support required.
+- **AI Availability**: Assumes Vercel AI SDK and GPT-4o endpoints remain accessible and within rate limits.
+- **Environment**: Developers have Docker installed for local DB; production runs on Vercel.
+- **User Behavior**: Users will phrase schedule items in natural language that the AI can parse into times and titles.
+- **Timezones**: Events are stored and displayed in the user’s local timezone.
+- **Secrets Management**: All API keys and DB URLs are provided via environment variables (no hard-coding).
 
 ---
 
 ## 8. Known Issues & Potential Pitfalls
 
-- **Static Data Limitation**: `data.json` is only for demo. A real API or database will be needed to avoid stale data.
-  *Mitigation*: Define a clear interface for data fetching so swapping to a live endpoint is trivial.
-
-- **Global CSS Conflicts**: Using global styles can lead to unintended overrides.
-  *Mitigation*: Plan to migrate to CSS Modules or utility-first CSS in Phase 2.
-
-- **API Route Ambiguity**: Single `/api/auth/route.ts` handling both sign-up and sign-in could get complex.
-  *Mitigation*: Clearly branch on HTTP method (`POST /register` vs. `POST /login`) or split into separate files.
-
-- **Lack of Testing**: No test suite means regressions can slip in.
-  *Mitigation*: Build a minimal Jest + React Testing Library setup in an early iteration.
-
-- **Error Handling Gaps**: Client and server must handle edge cases (network failures, malformed input).
-  *Mitigation*: Define a standard error response schema and show user-friendly messages.
+- **API Rate Limits**: Exceeding AI call quotas could break chat. Mitigation: throttle requests, show a “try again later” message.
+- **Parsing Errors**: AI might return malformed objects. Mitigation: validate with Zod, reject invalid events, and ask the user to clarify.
+- **Timezone Ambiguity**: Users may not specify timezones. Mitigation: default to browser’s locale and clearly label all times.
+- **Large Chat History**: Sending too much context can exceed model limits. Mitigation: only include the last 10 messages in the prompt.
+- **Database Migrations**: Schema changes can conflict in production. Mitigation: use Drizzle’s migration tooling and version control migrations.
+- **Calendar Library Styling**: Third-party calendar may need custom CSS overrides. Mitigation: wrap it in a styled component and test in both themes.
 
 ---
 
-This PRD should serve as the single source of truth for the AI model or any developer generating the next set of technical documents: Tech Stack Doc, Frontend Guidelines, Backend Structure, App Flow, File Structure, and IDE Rules. It contains all functional and non-functional requirements with no ambiguity, enabling seamless downstream development.
+*This document is the single source of truth for building the AI Schedule Audit Assistant’s first version. All subsequent design, architecture, and coding guidelines must reference it to ensure alignment and avoid ambiguity.*
