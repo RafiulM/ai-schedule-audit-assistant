@@ -469,7 +469,7 @@ export function DataTable({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" size="sm">
+          <Button variant="destructive" size="sm">
             <IconPlus />
             <span className="hidden lg:inline">Add Section</span>
           </Button>
