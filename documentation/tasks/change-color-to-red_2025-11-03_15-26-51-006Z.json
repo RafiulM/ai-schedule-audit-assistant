@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Update Create New Key button to use destructive variant",
+    "description": "Locate and modify the 'Create New Key' button component to use the new destructive variant instead of its current styling.",
+    "details": "Find the 'Create New Key' button in the dashboard (likely in `app/dashboard/page.tsx` or related component files). Update the Button component to use `variant=\"destructive\"` prop. Remove any existing custom className overrides that might conflict with the new variant. Ensure the button text remains clear and the functionality is unchanged - only the visual appearance should be modified.",
+    "status": "pending",
+    "test_strategy": "Manual testing in development environment to verify the button appears red and maintains all existing functionality. Test button interactions (click, hover, focus) to ensure they work as expected. Verify the button stands out appropriately in the UI context.",
+    "priority": "medium",
+    "ordinal": 1,
+    "task_group_id": "c7d425a6-6188-4350-afb7-77f6b0bbf779",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "3d97baf4-2a39-45d0-be09-6e88e409a41d",
+    "created_at": "2025-11-03T15:26:45.370672Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Verify styling consistency and accessibility",
+    "description": "Perform comprehensive testing to ensure the red button styling is consistent across different themes and meets accessibility requirements.",
+    "details": "Test the new red button in both light and dark theme modes to ensure it maintains proper contrast and visibility. Verify that the button styling is consistent with the overall design system. Check keyboard navigation and screen reader compatibility. Ensure the red color doesn't conflict with other UI elements or create confusion with destructive actions elsewhere in the app. Document any theme-specific adjustments needed.",
+    "status": "pending",
+    "test_strategy": "Manual testing across light/dark themes, keyboard navigation testing, screen reader testing with tools like NVDA or VoiceOver. Use browser accessibility auditing tools to verify WCAG compliance. Test on different screen sizes to ensure responsive behavior.",
+    "priority": "medium",
+    "ordinal": 2,
+    "task_group_id": "c7d425a6-6188-4350-afb7-77f6b0bbf779",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "ec7ab291-c6c5-4afa-a1c6-8fa7b957e61d",
+    "created_at": "2025-11-03T15:26:45.370674Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Add destructive variant to Button component",
+    "description": "Modify the shadcn/ui Button component to include a new 'destructive' variant with red styling that will be used for the 'Create New Key' button.",
+    "details": "Update the `components/ui/button.tsx` file by modifying the `buttonVariants` cva definition to include a new 'destructive' variant. Use Tailwind classes like `bg-red-500 text-white hover:bg-red-600 focus:ring-red-500` to create a red button with appropriate hover and focus states. Ensure the variant follows the existing pattern and maintains accessibility standards with proper contrast ratios. Update the TypeScript interface to include the new variant option.",
+    "status": "pending",
+    "test_strategy": "Create a component test to verify the new variant renders with correct CSS classes. Test hover and focus states. Verify accessibility contrast ratios meet WCAG AA standards using browser dev tools or automated accessibility testing.",
+    "priority": "medium",
+    "ordinal": 0,
+    "task_group_id": "c7d425a6-6188-4350-afb7-77f6b0bbf779",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "222803bf-ec89-4441-a2d7-afda183387f2",
+    "created_at": "2025-11-03T15:26:45.370662Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  }
+]
