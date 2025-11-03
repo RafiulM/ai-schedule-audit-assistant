@@ -116,6 +116,12 @@ const staticData = {
       title: "Settings",
       url: "#",
       icon: IconSettings,
+      items: [
+        {
+          title: "API Keys",
+          url: "/dashboard/settings/api-keys",
+        },
+      ],
     },
     {
       title: "Get Help",

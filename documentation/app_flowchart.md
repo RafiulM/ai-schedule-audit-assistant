@@ -1,14 +1,17 @@
 flowchart TD
-  Start[Landing Page]
-  SignUpPage[Sign Up Page]
-  SignInPage[Sign In Page]
-  AuthAPI[Authentication API Endpoint]
-  DashboardPage[Dashboard Page]
-  Start -->|Select Sign Up| SignUpPage
-  Start -->|Select Sign In| SignInPage
-  SignUpPage -->|Submit Credentials| AuthAPI
-  SignInPage -->|Submit Credentials| AuthAPI
-  AuthAPI -->|Success| DashboardPage
-  AuthAPI -->|Error| SignUpPage
-  AuthAPI -->|Error| SignInPage
-  DashboardPage -->|Click Logout| Start
+    Start[Start] --> SignIn[User Sign In]
+    SignIn --> Dashboard[Dashboard Page]
+    Dashboard --> ChatInterface[Open Chat Interface]
+    ChatInterface -->|User Message| APIChat[API Chat Route]
+    APIChat --> AISDK[AI SDK Processing]
+    AISDK --> Extract{Data Extraction Successful}
+    Extract -->|Yes| SaveEvents[Save Events to DB]
+    SaveEvents --> Database[PostgreSQL Database]
+    Extract -->|No| StreamResponse[Stream Raw Response]
+    AISDK --> StreamResponse
+    StreamResponse --> ChatInterface
+    Dashboard --> CalendarView[Open Calendar View]
+    CalendarView --> FetchData[Fetch Events from DB]
+    FetchData --> Database
+    FetchData --> ShowEvents[Display Events and Metrics]
+    ShowEvents --> CalendarView
