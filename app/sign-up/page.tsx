@@ -13,7 +13,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { signUp } from "@/lib/auth-client";
-import { Loader2, Eye, EyeOff } from "lucide-react";
 
 const signUpSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -33,8 +32,6 @@ type SignUpForm = z.infer<typeof signUpSchema>;
 export default function SignUpPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const router = useRouter();
 
     const form = useForm<SignUpForm>({
@@ -132,29 +129,12 @@ export default function SignUpPage() {
                                     <FormItem>
                                         <FormLabel>Password</FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <Input
-                                                    type={showPassword ? "text" : "password"}
-                                                    placeholder="Create a strong password"
-                                                    {...field}
-                                                    disabled={isLoading}
-                                                    className="pr-10"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    disabled={isLoading}
-                                                >
-                                                    {showPassword ? (
-                                                        <EyeOff className="h-4 w-4" />
-                                                    ) : (
-                                                        <Eye className="h-4 w-4" />
-                                                    )}
-                                                </Button>
-                                            </div>
+                                            <Input
+                                                type="password"
+                                                placeholder="Create a strong password"
+                                                {...field}
+                                                disabled={isLoading}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -168,44 +148,20 @@ export default function SignUpPage() {
                                     <FormItem>
                                         <FormLabel>Confirm Password</FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <Input
-                                                    type={showConfirmPassword ? "text" : "password"}
-                                                    placeholder="Confirm your password"
-                                                    {...field}
-                                                    disabled={isLoading}
-                                                    className="pr-10"
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                    disabled={isLoading}
-                                                >
-                                                    {showConfirmPassword ? (
-                                                        <EyeOff className="h-4 w-4" />
-                                                    ) : (
-                                                        <Eye className="h-4 w-4" />
-                                                    )}
-                                                </Button>
-                                            </div>
+                                            <Input
+                                                type="password"
+                                                placeholder="Confirm your password"
+                                                {...field}
+                                                disabled={isLoading}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
 
-                            <Button type="submit" className="w-full" disabled={isLoading}>
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Creating account...
-                                    </>
-                                ) : (
-                                    "Create Account"
-                                )}
+                            <Button type="submit" className="w-full h-11 font-semibold text-base shadow-sm hover:shadow-md transition-all" disabled={isLoading}>
+                                {isLoading ? "Creating account..." : "Create Account"}
                             </Button>
                         </form>
                     </Form>

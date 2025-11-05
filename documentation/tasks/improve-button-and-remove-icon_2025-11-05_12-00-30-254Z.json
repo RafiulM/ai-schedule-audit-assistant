@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Locate and Identify the Create New Key Button Component",
+    "description": "Find the specific React component containing the 'Create New Key' button within the dashboard structure and identify the icon element that needs to be removed.",
+    "details": "Navigate through the app/dashboard/ directory structure to locate the component rendering the 'Create New Key' button. This is most likely in app/dashboard/page.tsx or a child component. Once found, examine the Button component instance to identify the icon element (likely a Plus icon from lucide-react) that needs to be removed. Document the current implementation including the icon import statement and its usage within the button.",
+    "status": "pending",
+    "test_strategy": "Visually inspect the current dashboard to confirm the button location and icon presence. Use browser developer tools to inspect the button element and verify its current structure.",
+    "priority": "high",
+    "ordinal": 0,
+    "task_group_id": "5e99c7af-f2eb-4f82-bde3-35f284e1736e",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "c2a59a7c-f756-4513-ba95-f2a3cc8de501",
+    "created_at": "2025-11-05T12:00:24.714271Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Remove Icon Element and Clean Up Imports",
+    "description": "Remove the icon element from the Create New Key button and clean up any unused import statements.",
+    "details": "Delete the icon component (e.g., <Plus className='...' />) from within the Button component's children. Remove the corresponding import statement for the icon at the top of the file if it's no longer used elsewhere in the component. Ensure the button text remains properly positioned and the button maintains its functionality. Verify that the button's variant and size props are appropriate for the design system.",
+    "status": "pending",
+    "test_strategy": "Test the button functionality to ensure it still works correctly after icon removal. Verify no console errors appear due to unused imports. Check that the button text is properly aligned and the overall appearance is clean.",
+    "priority": "high",
+    "ordinal": 1,
+    "task_group_id": "5e99c7af-f2eb-4f82-bde3-35f284e1736e",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "5b4ee32f-678c-4af9-a9a3-e2b26fab521d",
+    "created_at": "2025-11-05T12:00:24.714281Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  },
+  {
+    "title": "Validate UI Consistency and Accessibility",
+    "description": "Ensure the modified button maintains design consistency with the application's UI system and accessibility standards.",
+    "details": "Review the button's styling to confirm it follows the shadcn/ui design system guidelines and is consistent with other buttons in the dashboard. Verify that removing the icon doesn't negatively impact the button's accessibility or clarity of purpose. Test keyboard navigation and screen reader compatibility. Ensure the button's visual hierarchy and spacing work well within the dashboard layout. Run the project's linting and formatting tools to maintain code quality standards.",
+    "status": "pending",
+    "test_strategy": "Perform visual regression testing by comparing before and after screenshots. Test keyboard navigation to ensure the button is still accessible via Tab key. Use accessibility testing tools to verify ARIA compliance. Run existing end-to-end tests for the key creation workflow to ensure no regressions.",
+    "priority": "medium",
+    "ordinal": 2,
+    "task_group_id": "5e99c7af-f2eb-4f82-bde3-35f284e1736e",
+    "parent_task_id": null,
+    "ai_result": null,
+    "id": "5badff7a-5d84-4c03-81f2-b953db3460d5",
+    "created_at": "2025-11-05T12:00:24.714284Z",
+    "user_id": "user_2qaB6nlVH3R9QXhQZpt1nmVDymN",
+    "subtasks": []
+  }
+]

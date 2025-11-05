@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LogIn, LogOut, User, UserPlus } from "lucide-react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
@@ -74,7 +73,6 @@ export function AuthButtons() {
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link href="/dashboard">
-              <User className="mr-2 h-4 w-4" />
               Dashboard
             </Link>
           </DropdownMenuItem>
@@ -83,7 +81,6 @@ export function AuthButtons() {
             onClick={handleSignOut}
             disabled={isSigningOut}
           >
-            <LogOut className="mr-2 h-4 w-4" />
             {isSigningOut ? "Signing out..." : "Sign out"}
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -93,15 +90,13 @@ export function AuthButtons() {
 
   return (
     <div className="flex items-center gap-2">
-      <Button asChild variant="ghost" size="sm">
+      <Button asChild variant="secondary" size="sm" className="font-medium hover:bg-secondary/80 transition-colors">
         <Link href="/sign-in">
-          <LogIn className="mr-2 h-4 w-4" />
           Sign In
         </Link>
       </Button>
-      <Button asChild size="sm">
+      <Button asChild size="sm" className="font-medium shadow-sm hover:shadow-md transition-shadow">
         <Link href="/sign-up">
-          <UserPlus className="mr-2 h-4 w-4" />
           Sign Up
         </Link>
       </Button>
@@ -125,9 +120,8 @@ export function HeroAuthButtons() {
   if (session?.user) {
     return (
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button asChild size="lg" className="text-base px-8 py-3">
+        <Button asChild size="lg" className="text-base px-10 py-4 font-semibold text-lg shadow-md hover:shadow-lg transition-shadow">
           <Link href="/dashboard">
-            <User className="mr-2 h-5 w-5" />
             Go to Dashboard
           </Link>
         </Button>
@@ -137,15 +131,13 @@ export function HeroAuthButtons() {
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-      <Button asChild size="lg" className="text-base px-8 py-3">
+      <Button asChild size="lg" className="text-base px-10 py-4 font-semibold text-lg shadow-md hover:shadow-lg transition-shadow">
         <Link href="/sign-up">
-          <UserPlus className="mr-2 h-5 w-5" />
           Get Started
         </Link>
       </Button>
-      <Button asChild variant="outline" size="lg" className="text-base px-8 py-3">
+      <Button asChild variant="outline" size="lg" className="text-base px-10 py-4 font-semibold text-lg border-2 hover:bg-accent hover:text-accent-foreground transition-colors">
         <Link href="/sign-in">
-          <LogIn className="mr-2 h-5 w-5" />
           Sign In
         </Link>
       </Button>
